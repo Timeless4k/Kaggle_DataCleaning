@@ -1,1 +1,626 @@
-{"metadata":{"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"},"language_info":{"codemirror_mode":{"name":"ipython","version":3},"file_extension":".py","mimetype":"text/x-python","name":"python","nbconvert_exporter":"python","pygments_lexer":"ipython3","version":"3.6.5"},"kaggle":{"accelerator":"none","dataSources":[{"sourceId":4395,"sourceType":"datasetVersion","datasetId":2647}],"isInternetEnabled":false,"language":"python","sourceType":"notebook","isGpuEnabled":false}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"markdown","source":"**This notebook is an exercise in the [Data Cleaning](https://www.kaggle.com/learn/data-cleaning) course.  You can reference the tutorial at [this link](https://www.kaggle.com/alexisbcook/character-encodings).**\n\n---\n","metadata":{}},{"cell_type":"markdown","source":"In this exercise, you'll apply what you learned in the **Character encodings** tutorial.\n\n# Setup\n\nThe questions below will give you feedback on your work. Run the following cell to set up the feedback system.","metadata":{}},{"cell_type":"code","source":"from learntools.core import binder\nbinder.bind(globals())\nfrom learntools.data_cleaning.ex4 import *\nprint(\"Setup Complete\")","metadata":{"trusted":true},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"# Get our environment set up\n\nThe first thing we'll need to do is load in the libraries we'll be using.","metadata":{}},{"cell_type":"code","source":"# modules we'll use\nimport pandas as pd\nimport numpy as np\n\n# helpful character encoding module\nimport charset_normalizer\n\n# set seed for reproducibility\nnp.random.seed(0)","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"# 1) What are encodings?\n\nYou're working with a dataset composed of bytes.  Run the code cell below to print a sample entry.","metadata":{}},{"cell_type":"code","source":"sample_entry = b'\\xa7A\\xa6n'\nprint(sample_entry)\nprint('data type:', type(sample_entry))","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"You notice that it doesn't use the standard UTF-8 encoding. \n\nUse the next code cell to create a variable `new_entry` that changes the encoding from `\"big5-tw\"` to `\"utf-8\"`.  `new_entry` should have the bytes datatype.","metadata":{}},{"cell_type":"code","source":"new_entry = ____\n\n# Check your answer\nq1.check()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"code","source":"# Lines below will give you a hint or solution code\n#q1.hint()\n#q1.solution()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"# 2) Reading in files with encoding problems\n\nUse the code cell below to read in this file at path `\"../input/fatal-police-shootings-in-the-us/PoliceKillingsUS.csv\"`.  \n\nFigure out what the correct encoding should be and read in the file to a DataFrame `police_killings`.","metadata":{}},{"cell_type":"code","source":"# TODO: Load in the DataFrame correctly.\npolice_killings = ____\n\n# Check your answer\nq2.check()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"Feel free to use any additional code cells for supplemental work.  To get credit for finishing this question, you'll need to run `q2.check()` and get a result of **Correct**.","metadata":{}},{"cell_type":"code","source":"# (Optional) Use this code cell for any additional work.","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"code","source":"# Lines below will give you a hint or solution code\n#q2.hint()\n#q2.solution()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"# 3) Saving your files with UTF-8 encoding\n\nSave a version of the police killings dataset to CSV with UTF-8 encoding.  Your answer will be marked correct after saving this file.  \n\nNote: When using the `to_csv()` method, supply only the name of the file (e.g., `\"my_file.csv\"`).  This saves the file at the filepath `\"/kaggle/working/my_file.csv\"`.","metadata":{}},{"cell_type":"code","source":"# TODO: Save the police killings dataset to CSV\n____\n\n# Check your answer\nq3.check()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"code","source":"# Lines below will give you a hint or solution code\n#q3.hint()\n#q3.solution()","metadata":{},"outputs":[],"execution_count":null},{"cell_type":"markdown","source":"# (Optional) More practice\n\nCheck out [this dataset of files in different character encodings](https://www.kaggle.com/rtatman/character-encoding-examples). Can you read in all the files with their original encodings and them save them out as UTF-8 files?\n\nIf you have a file that's in UTF-8 but has just a couple of weird-looking characters in it, you can try out the [ftfy module](https://ftfy.readthedocs.io/en/latest/#) and see if it helps. \n\n# Keep going\n\nIn the final lesson, learn how to [**clean up inconsistent text entries**](https://www.kaggle.com/alexisbcook/inconsistent-data-entry) in your dataset.","metadata":{}},{"cell_type":"markdown","source":"---\n\n\n\n\n*Have questions or comments? Visit the [course discussion forum](https://www.kaggle.com/learn/data-cleaning/discussion) to chat with other learners.*","metadata":{}}]}
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "2c592df4",
+   "metadata": {
+    "papermill": {
+     "duration": 0.004071,
+     "end_time": "2025-05-10T13:45:17.293265",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:17.289194",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**This notebook is an exercise in the [Data Cleaning](https://www.kaggle.com/learn/data-cleaning) course.  You can reference the tutorial at [this link](https://www.kaggle.com/alexisbcook/character-encodings).**\n",
+    "\n",
+    "---\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "615b2e62",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002936,
+     "end_time": "2025-05-10T13:45:17.299610",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:17.296674",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "In this exercise, you'll apply what you learned in the **Character encodings** tutorial.\n",
+    "\n",
+    "# Setup\n",
+    "\n",
+    "The questions below will give you feedback on your work. Run the following cell to set up the feedback system."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "f222495a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:17.307059Z",
+     "iopub.status.busy": "2025-05-10T13:45:17.306760Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.192593Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.191504Z"
+    },
+    "papermill": {
+     "duration": 1.891339,
+     "end_time": "2025-05-10T13:45:19.194122",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:17.302783",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Setup Complete\n"
+     ]
+    }
+   ],
+   "source": [
+    "from learntools.core import binder\n",
+    "binder.bind(globals())\n",
+    "from learntools.data_cleaning.ex4 import *\n",
+    "print(\"Setup Complete\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fe64aee8",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002913,
+     "end_time": "2025-05-10T13:45:19.200404",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.197491",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Get our environment set up\n",
+    "\n",
+    "The first thing we'll need to do is load in the libraries we'll be using."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "88384cc7",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.207777Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.207487Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.212111Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.211367Z"
+    },
+    "papermill": {
+     "duration": 0.009994,
+     "end_time": "2025-05-10T13:45:19.213524",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.203530",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# modules we'll use\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "\n",
+    "# helpful character encoding module\n",
+    "import charset_normalizer\n",
+    "\n",
+    "# set seed for reproducibility\n",
+    "np.random.seed(0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9eef8a73",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003036,
+     "end_time": "2025-05-10T13:45:19.219937",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.216901",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# 1) What are encodings?\n",
+    "\n",
+    "You're working with a dataset composed of bytes.  Run the code cell below to print a sample entry."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "97cfab42",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.227895Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.227257Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.232156Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.231240Z"
+    },
+    "papermill": {
+     "duration": 0.010101,
+     "end_time": "2025-05-10T13:45:19.233385",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.223284",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "b'\\xa7A\\xa6n'\n",
+      "data type: <class 'bytes'>\n"
+     ]
+    }
+   ],
+   "source": [
+    "sample_entry = b'\\xa7A\\xa6n'\n",
+    "print(sample_entry)\n",
+    "print('data type:', type(sample_entry))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "223bd7fc",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002996,
+     "end_time": "2025-05-10T13:45:19.239673",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.236677",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "You notice that it doesn't use the standard UTF-8 encoding. \n",
+    "\n",
+    "Use the next code cell to create a variable `new_entry` that changes the encoding from `\"big5-tw\"` to `\"utf-8\"`.  `new_entry` should have the bytes datatype."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "9a444cce",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.247240Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.246950Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.255409Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.254651Z"
+    },
+    "papermill": {
+     "duration": 0.013951,
+     "end_time": "2025-05-10T13:45:19.256879",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.242928",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/javascript": [
+       "parent.postMessage({\"jupyterEvent\": \"custom.exercise_interaction\", \"data\": {\"outcomeType\": 1, \"valueTowardsCompletion\": 0.3333333333333333, \"interactionType\": 1, \"questionType\": 1, \"questionId\": \"1_EncodingsIntro\", \"learnToolsVersion\": \"0.3.5\", \"failureMessage\": \"\", \"exceptionClass\": \"\", \"trace\": \"\"}}, \"*\")"
+      ],
+      "text/plain": [
+       "<IPython.core.display.Javascript object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "text/markdown": [
+       "<span style=\"color:#33cc33\">Correct</span>"
+      ],
+      "text/plain": [
+       "Correct"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "new_entry = sample_entry.decode(\"big5-tw\").encode(\"utf-8\")\n",
+    "\n",
+    "# Check your answer\n",
+    "q1.check()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "1bc69909",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.265788Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.265042Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.268973Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.268117Z"
+    },
+    "papermill": {
+     "duration": 0.010001,
+     "end_time": "2025-05-10T13:45:19.270495",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.260494",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Lines below will give you a hint or solution code\n",
+    "#q1.hint()\n",
+    "#q1.solution()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "453ce8bd",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003208,
+     "end_time": "2025-05-10T13:45:19.277366",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.274158",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# 2) Reading in files with encoding problems\n",
+    "\n",
+    "Use the code cell below to read in this file at path `\"../input/fatal-police-shootings-in-the-us/PoliceKillingsUS.csv\"`.  \n",
+    "\n",
+    "Figure out what the correct encoding should be and read in the file to a DataFrame `police_killings`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "edc93f01",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.285362Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.285019Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.306458Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.305698Z"
+    },
+    "papermill": {
+     "duration": 0.027124,
+     "end_time": "2025-05-10T13:45:19.307840",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.280716",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/javascript": [
+       "parent.postMessage({\"jupyterEvent\": \"custom.exercise_interaction\", \"data\": {\"outcomeType\": 1, \"valueTowardsCompletion\": 0.3333333333333333, \"interactionType\": 1, \"questionType\": 1, \"questionId\": \"2_ReadIn\", \"learnToolsVersion\": \"0.3.5\", \"failureMessage\": \"\", \"exceptionClass\": \"\", \"trace\": \"\"}}, \"*\")"
+      ],
+      "text/plain": [
+       "<IPython.core.display.Javascript object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "text/markdown": [
+       "<span style=\"color:#33cc33\">Correct</span>"
+      ],
+      "text/plain": [
+       "Correct"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# Correct encoding for this file is 'windows-1252' (often used for Western characters)\n",
+    "police_killings = pd.read_csv(\"../input/fatal-police-shootings-in-the-us/PoliceKillingsUS.csv\", encoding='windows-1252')\n",
+    "\n",
+    "# Check your answer\n",
+    "q2.check()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5e868cd5",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003479,
+     "end_time": "2025-05-10T13:45:19.315228",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.311749",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "Feel free to use any additional code cells for supplemental work.  To get credit for finishing this question, you'll need to run `q2.check()` and get a result of **Correct**."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "ee3fa989",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.325096Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.324210Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.328183Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.327524Z"
+    },
+    "papermill": {
+     "duration": 0.010313,
+     "end_time": "2025-05-10T13:45:19.329449",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.319136",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# (Optional) Use this code cell for any additional work."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "86e7d35c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.338443Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.338119Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.341815Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.341057Z"
+    },
+    "papermill": {
+     "duration": 0.009629,
+     "end_time": "2025-05-10T13:45:19.343127",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.333498",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Lines below will give you a hint or solution code\n",
+    "#q2.hint()\n",
+    "#q2.solution()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5741b34",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003496,
+     "end_time": "2025-05-10T13:45:19.350691",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.347195",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# 3) Saving your files with UTF-8 encoding\n",
+    "\n",
+    "Save a version of the police killings dataset to CSV with UTF-8 encoding.  Your answer will be marked correct after saving this file.  \n",
+    "\n",
+    "Note: When using the `to_csv()` method, supply only the name of the file (e.g., `\"my_file.csv\"`).  This saves the file at the filepath `\"/kaggle/working/my_file.csv\"`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "ae3678d8",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.359350Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.358673Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.400640Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.399762Z"
+    },
+    "papermill": {
+     "duration": 0.049507,
+     "end_time": "2025-05-10T13:45:19.403774",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.354267",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "application/javascript": [
+       "parent.postMessage({\"jupyterEvent\": \"custom.exercise_interaction\", \"data\": {\"outcomeType\": 1, \"valueTowardsCompletion\": 0.3333333333333333, \"interactionType\": 1, \"questionType\": 2, \"questionId\": \"3_SaveCSV\", \"learnToolsVersion\": \"0.3.5\", \"failureMessage\": \"\", \"exceptionClass\": \"\", \"trace\": \"\"}}, \"*\")"
+      ],
+      "text/plain": [
+       "<IPython.core.display.Javascript object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "text/markdown": [
+       "<span style=\"color:#33cc33\">Correct</span>"
+      ],
+      "text/plain": [
+       "Correct"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# Save with UTF-8 encoding\n",
+    "police_killings.to_csv(\"police_killings_utf8.csv\", encoding='utf-8')\n",
+    "\n",
+    "# Check your answer\n",
+    "q3.check()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "d3dc6332",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-05-10T13:45:19.414190Z",
+     "iopub.status.busy": "2025-05-10T13:45:19.413541Z",
+     "iopub.status.idle": "2025-05-10T13:45:19.417154Z",
+     "shell.execute_reply": "2025-05-10T13:45:19.416480Z"
+    },
+    "papermill": {
+     "duration": 0.010263,
+     "end_time": "2025-05-10T13:45:19.418531",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.408268",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Lines below will give you a hint or solution code\n",
+    "#q3.hint()\n",
+    "#q3.solution()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d603d0a5",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003601,
+     "end_time": "2025-05-10T13:45:19.426131",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.422530",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# (Optional) More practice\n",
+    "\n",
+    "Check out [this dataset of files in different character encodings](https://www.kaggle.com/rtatman/character-encoding-examples). Can you read in all the files with their original encodings and them save them out as UTF-8 files?\n",
+    "\n",
+    "If you have a file that's in UTF-8 but has just a couple of weird-looking characters in it, you can try out the [ftfy module](https://ftfy.readthedocs.io/en/latest/#) and see if it helps. \n",
+    "\n",
+    "# Keep going\n",
+    "\n",
+    "In the final lesson, learn how to [**clean up inconsistent text entries**](https://www.kaggle.com/alexisbcook/inconsistent-data-entry) in your dataset."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0e2b04f9",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003556,
+     "end_time": "2025-05-10T13:45:19.433394",
+     "exception": false,
+     "start_time": "2025-05-10T13:45:19.429838",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "---\n",
+    "\n",
+    "\n",
+    "\n",
+    "\n",
+    "*Have questions or comments? Visit the [course discussion forum](https://www.kaggle.com/learn/data-cleaning/discussion) to chat with other learners.*"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 2647,
+     "sourceId": 4395,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "isGpuEnabled": false,
+   "isInternetEnabled": false,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.11"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 7.515442,
+   "end_time": "2025-05-10T13:45:19.955739",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-05-10T13:45:12.440297",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
